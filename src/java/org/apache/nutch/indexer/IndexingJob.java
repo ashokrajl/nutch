@@ -57,6 +57,7 @@ import org.slf4j.LoggerFactory;
 public class IndexingJob extends NutchTool implements Tool {
 
   public static Logger LOG = LoggerFactory.getLogger(IndexingJob.class);
+  private String indexID;
 
   public IndexingJob() {
     super(null);
@@ -107,6 +108,7 @@ public class IndexingJob extends NutchTool implements Tool {
 
     final JobConf job = new NutchJob(getConf());
     job.setJobName("Indexer");
+    job.set("indexID", getIndexID());
 
     LOG.info("Indexer: deleting gone documents: {}", deleteGone);
     LOG.info("Indexer: URL filtering: {}", filter);
@@ -316,6 +318,12 @@ public class IndexingJob extends NutchTool implements Tool {
       }
     }
 
+     String indexID = "";
+	if(args.containsKey("index_id")){
+	  indexID = (String)args.get("index_id");
+		LOG.info("Got indexID for indexing - "+indexID);
+	}
+
     if(!isSegment){
       String segment_dir = crawlId+"/segments";
       File segmentsDir = new File(segment_dir);
@@ -349,10 +357,19 @@ public class IndexingJob extends NutchTool implements Tool {
       params = (String)args.get("params");
     }
     setConf(conf);
+    setIndexID(indexID);
     index(crawlDb, linkdb, segments, noCommit, deleteGone, params, filter,
-        normalize);
+        normalize); 
     Map<String, Object> results = new HashMap<String, Object>();
     results.put(Nutch.VAL_RESULT, 0);
     return results;
   }
+
+   public void setIndexID(String indexID){
+	this.indexID = indexID;
+    }
+
+   public String getIndexID(){
+   	return this.indexID;
+   }
 }

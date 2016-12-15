@@ -81,7 +81,7 @@ public class BasicIndexingFilter implements IndexingFilter {
     String reprUrlString = reprUrl != null ? reprUrl.toString() : null;
     String urlString = url.toString();
 
-    String host = null;
+   // String host = null;
     try {
       URL u;
       if (reprUrlString != null) {
@@ -90,18 +90,18 @@ public class BasicIndexingFilter implements IndexingFilter {
         u = new URL(urlString);
       }
 
-      if (addDomain) {
+     /* if (addDomain) {
         doc.add("domain", URLUtil.getDomainName(u));
-      }
+      }*/
 
-      host = u.getHost();
+     // host = u.getHost();
     } catch (MalformedURLException e) {
       throw new IndexingException(e);
     }
 
-    if (host != null) {
+   /* if (host != null) {
       doc.add("host", host);
-    }
+    }*/
 
     doc.add("url", reprUrlString == null ? urlString : reprUrlString);
 
@@ -133,7 +133,7 @@ public class BasicIndexingFilter implements IndexingFilter {
     }
 
     // add timestamp when fetched, for deduplication
-    doc.add("tstamp", new Date(datum.getFetchTime()));
+   // doc.add("tstamp", new Date(datum.getFetchTime()));
 
     return doc;
   }

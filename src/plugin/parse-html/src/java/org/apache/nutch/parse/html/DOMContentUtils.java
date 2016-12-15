@@ -22,13 +22,15 @@ import java.net.MalformedURLException;
 import java.util.Collection;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.Stack;
 
 import org.apache.nutch.parse.Outlink;
 import org.apache.nutch.util.NodeWalker;
 import org.apache.nutch.util.URLUtil;
 import org.apache.hadoop.conf.Configuration;
-
+import org.json.JSONArray;
+import org.json.JSONObject;
 import org.w3c.dom.*;
 
 /**
@@ -58,8 +60,17 @@ public class DOMContentUtils {
 
   private HashMap<String, LinkParams> linkParams = new HashMap<String, LinkParams>();
   private Configuration conf;
+  private String glossary;
 
-  public DOMContentUtils(Configuration conf) {
+  public String getGlossary() {
+	return glossary;
+}
+
+public void setGlossary(String glossary) {
+	this.glossary = glossary;
+}
+
+public DOMContentUtils(Configuration conf) {
     setConf(conf);
   }
 
@@ -124,17 +135,24 @@ public class DOMContentUtils {
 
   // returns true if abortOnNestedAnchors is true and we find nested
   // anchors
+  /*Glossary parsing added - Ashok*/
   private boolean getTextHelper(StringBuffer sb, Node node,
       boolean abortOnNestedAnchors, int anchorDepth) {
     boolean abort = false;
     NodeWalker walker = new NodeWalker(node);
-
+    JSONArray list = new JSONArray();
+    
     while (walker.hasNext()) {
+    	
 
+    	
       Node currentNode = walker.nextNode();
       String nodeName = currentNode.getNodeName();
       short nodeType = currentNode.getNodeType();
+      
 
+
+  	
       if ("script".equalsIgnoreCase(nodeName)) {
         walker.skipChildren();
       }
@@ -151,6 +169,28 @@ public class DOMContentUtils {
       if (nodeType == Node.COMMENT_NODE) {
         walker.skipChildren();
       }
+      
+    	if (nodeType == Node.ELEMENT_NODE) {
+    		if ("img".equalsIgnoreCase(nodeName)) {
+    			//TODO -
+    		}}
+      	
+      	if(nodeType == Node.ELEMENT_NODE && "dt".equalsIgnoreCase(nodeName) ){
+      		JSONObject outerObj = new JSONObject();
+      		JSONObject obj = new JSONObject();
+      		String term = currentNode.getTextContent();
+      		String definition = currentNode.getNextSibling().getTextContent();
+      		obj.put(term, definition);
+
+      		String id =  currentNode.getAttributes().getNamedItem("id").getNodeValue();
+      		if(id!=null){
+      			outerObj.put(id, obj);
+      		}
+      		list.put(outerObj);
+      		this.setGlossary(list.toString());
+      		continue; //needn't check for any other tag if it's dt (glossary)
+      	}
+      
       if (nodeType == Node.TEXT_NODE) {
         // cleanup and trim the value
         String text = currentNode.getNodeValue();
@@ -162,8 +202,9 @@ public class DOMContentUtils {
           sb.append(text);
         }
       }
+     
     }
-
+    System.out.println(list);
     return abort;
   }
 

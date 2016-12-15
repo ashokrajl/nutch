@@ -180,7 +180,11 @@ public class IndexerMapReduce extends Configured implements
     output.collect(key, new NutchWritable(value));
   }
 
-  public void reduce(Text key, Iterator<NutchWritable> values,
+  /* 
+   * unwanted fields skipped
+   * & glossary addition to index - Ashok
+ */
+public void reduce(Text key, Iterator<NutchWritable> values,
       OutputCollector<Text, NutchIndexAction> output, Reporter reporter)
           throws IOException {
     Inlinks inlinks = null;
@@ -282,15 +286,18 @@ public class IndexerMapReduce extends Configured implements
     doc.add("id", key.toString());
 
     final Metadata metadata = parseData.getContentMeta();
+    
 
     // add segment, used to map from merged index back to segment files
-    doc.add("segment", metadata.get(Nutch.SEGMENT_NAME_KEY));
+    //doc.add("segment", metadata.get(Nutch.SEGMENT_NAME_KEY));
 
     // add digest, used by dedup
-    doc.add("digest", metadata.get(Nutch.SIGNATURE_KEY));
+   // doc.add("digest", metadata.get(Nutch.SIGNATURE_KEY));
+    
+    doc.add("glossary", parseData.getParseMeta().get("glossary"));
     
     final Parse parse = new ParseImpl(parseText, parseData);
-    float boost = 1.0f;
+/*    float boost = 1.0f;
     // run scoring filters
     try {
       boost = this.scfilters.indexerScore(key, doc, dbDatum, fetchDatum, parse,
@@ -305,7 +312,7 @@ public class IndexerMapReduce extends Configured implements
     // apply boost to all indexed fields.
     doc.setWeight(boost);
     // store boost for use by explain and dedup
-    doc.add("boost", Float.toString(boost));
+    doc.add("boost", Float.toString(boost));*/
 
     try {
       // Indexing filters may also be interested in the signature
