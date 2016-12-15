@@ -118,6 +118,8 @@ public class OPICScoringFilter implements ScoringFilter {
   /**
    * Get a float value from Fetcher.SCORE_KEY, divide it by the number of
    * outlinks and apply.
+   * 
+   * Added parent url in metadata -Ashok
    */
   public CrawlDatum distributeScoreToOutlinks(Text fromUrl,
       ParseData parseData, Collection<Entry<Text, CrawlDatum>> targets,
@@ -148,6 +150,7 @@ public class OPICScoringFilter implements ScoringFilter {
       try {
         String toHost = new URL(target.getKey().toString()).getHost();
         String fromHost = new URL(fromUrl.toString()).getHost();
+        target.getValue().getMetaData().put(new Text("parent"), fromUrl);
         if (toHost.equalsIgnoreCase(fromHost)) {
           target.getValue().setScore(internalScore);
         } else {
@@ -161,6 +164,7 @@ public class OPICScoringFilter implements ScoringFilter {
     // XXX (ab) no adjustment? I think this is contrary to the algorithm descr.
     // XXX in the paper, where page "loses" its score if it's distributed to
     // XXX linked pages...
+   // adjust.getMetaData().put(new Text("parent"), fromUrl);
     return adjust;
   }
 
