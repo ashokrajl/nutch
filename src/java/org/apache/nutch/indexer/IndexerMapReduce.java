@@ -182,7 +182,7 @@ public class IndexerMapReduce extends Configured implements
 
   /* 
    * unwanted fields skipped
-   * & glossary addition to index - Ashok
+   * & glossary, glossaryRef addition to index - Ashok
  */
 public void reduce(Text key, Iterator<NutchWritable> values,
       OutputCollector<Text, NutchIndexAction> output, Reporter reporter)
@@ -295,6 +295,8 @@ public void reduce(Text key, Iterator<NutchWritable> values,
    // doc.add("digest", metadata.get(Nutch.SIGNATURE_KEY));
     
     doc.add("glossary", parseData.getParseMeta().get("glossary"));
+    doc.add("glossaryref", parseData.getParseMeta().get("glossaryref"));
+
     
     final Parse parse = new ParseImpl(parseText, parseData);
 /*    float boost = 1.0f;

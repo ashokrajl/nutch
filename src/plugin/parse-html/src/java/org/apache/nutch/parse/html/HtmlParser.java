@@ -129,7 +129,7 @@ public class HtmlParser implements Parser {
   private String cachingPolicy;
 
   /* 
-   * Adding parsed glossary in Metadata - Ashok
+   * Adding parsed glossary & glossaryRef in Metadata - Ashok
  */
 public ParseResult getParse(Content content) {
     HTMLMetaTags metaTags = new HTMLMetaTags();
@@ -222,6 +222,8 @@ public ParseResult getParse(Content content) {
     }
     
     String glossary = utils.getGlossary();
+    String glossaryRef = utils.getGlossaryRef();
+
 
     ParseStatus status = new ParseStatus(ParseStatus.SUCCESS);
     if (metaTags.getRefresh()) {
@@ -230,6 +232,8 @@ public ParseResult getParse(Content content) {
           Integer.toString(metaTags.getRefreshTime()) });
     }
     metadata.add("glossary", glossary);
+    metadata.add("glossaryref", glossaryRef);
+
     ParseData parseData = new ParseData(status, title, outlinks,
         content.getMetadata(), metadata);
     ParseResult parseResult = ParseResult.createParseResult(content.getUrl(),
