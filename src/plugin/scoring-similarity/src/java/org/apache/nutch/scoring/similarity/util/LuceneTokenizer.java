@@ -19,7 +19,6 @@ package org.apache.nutch.scoring.similarity.util;
 import java.io.StringReader;
 import java.util.List;
 
-import org.apache.lucene.analysis.Tokenizer;
 import org.apache.lucene.analysis.TokenStream;
 import org.apache.lucene.analysis.core.LowerCaseFilter;
 import org.apache.lucene.analysis.core.StopFilter;
@@ -114,29 +113,21 @@ public class LuceneTokenizer {
     return tokenStream;
   }
 
-  private TokenStream generateTokenStreamFromText(String content, TokenizerType tokenizerType){
-    Tokenizer tokenizer = null;
-    switch(tokenizerType){
+  private TokenStream generateTokenStreamFromText(String content, TokenizerType tokenizer){
+    switch(tokenizer){
     case CLASSIC:
-      tokenizer = new ClassicTokenizer();
+      tokenStream = new ClassicTokenizer(new StringReader(content));
       break;
 
     case STANDARD:
-    default:
-      tokenizer = new StandardTokenizer();
+      tokenStream = new StandardTokenizer(new StringReader(content));
     }
-
-    tokenizer.setReader(new StringReader(content));
-
-    tokenStream = tokenizer;
-
     return tokenStream;
   }
 
   private TokenStream createNGramTokenStream(String content, int mingram, int maxgram) {
-    Tokenizer tokenizer = new StandardTokenizer();
-    tokenizer.setReader(new StringReader(content));
-    tokenStream = new LowerCaseFilter(tokenizer);
+    tokenStream = new StandardTokenizer(new StringReader(content));
+    tokenStream = new LowerCaseFilter(tokenStream);
     tokenStream = applyStemmer(stemFilterType);
     ShingleFilter shingleFilter = new ShingleFilter(tokenStream, mingram, maxgram);
     shingleFilter.setOutputUnigrams(false);

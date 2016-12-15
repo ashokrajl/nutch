@@ -70,8 +70,8 @@ public class LuceneAnalyzerUtil extends Analyzer{
   }
     
   @Override
-  protected TokenStreamComponents createComponents(String fieldName) {
-    Tokenizer source = new ClassicTokenizer();
+  protected TokenStreamComponents createComponents(String fieldName, Reader reader) {
+    Tokenizer source = new ClassicTokenizer(reader);
     TokenStream filter = new LowerCaseFilter(source);
     if(stopSet != null) {
       filter = new StopFilter(filter, stopSet);
